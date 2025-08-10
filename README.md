@@ -127,7 +127,6 @@ python -m innovation_orchestrator_a2a.main
 
 ---
 # How to Run Innovation Orchestrator (File Input & Interactive Input)
-
 Below is a complete example showing two ways to run the **Innovation Orchestrator**:
 - Using a **JSON input file**
 - Using **manual (interactive) input**
@@ -250,10 +249,83 @@ customer_insights: {...}
 
 The process is identical to the file‑based run: the orchestrator collects `region` and `product` from the user, kicks off the same A2A negotiation/communication sequence, uses MCP for data, and finishes with a consolidated plan.
 
+---
+# Sample Input → Go‑to‑Market Plan (Final Output)
+Here’s how a high‑level request is transformed into a launch‑ready go‑to‑market plan by the Innovation Orchestrator.
+
+## 📥 Sample Input
+```json
+{
+  "region": "LATAM",
+  "product": "Circular Supply Chain Solution"
+}
+```
+
+## 🔄 How It’s Processed
+1. **Ingestion & Orchestration** – Orchestrator decomposes the goal and coordinates specialist agents via the Agent‑to‑Agent (A2A) protocol.
+2. **Data via MCP** – Each agent uses the (mock) Model Context Protocol (MCP) client to fetch market, customer, compliance/ESG, partner, and design context.
+3. **Agentic Chatter** – Agents negotiate and execute using A2A messages (RFP → PROPOSE → ACCEPT → TASK → RESULT).
+4. **Synthesis** – Orchestrator aggregates all results into a unified go‑to‑market plan.
+
+1. **Ingestion & Orchestration:** The orchestrator receives the region and product and breaks the goal into tasks. It uses the Agent‑to‑Agent (A2A) protocol to discover appropriate agents (market, customer, compliance, partnerships, design, go‑to‑market), negotiate capabilities, and assign tasks
+2. **Data Acquisition via MCP:** Each specialized agent uses the Model Context Protocol (MCP) to fetch external data—market trends, customer sentiment, regulations, partner lists, design assets—showing how MCP connects agents to tools and data sources.
+3. **Agentic Chatter:** As tasks progress, agents send messages back to the orchestrator. Logs like “Received unhandled ACCEPT message…” and “Market trends for LATAM: …” reflect the A2A lifecycle: discovery → RFP → proposal → task execution → results.
+4. **Synthesis & Output:** When all agents finish, the orchestrator synthesizes the results into a unified plan—a complete go‑to‑market strategy.
+
+## 📦 Example Final Output
+```json
+{
+  "region": "LATAM",
+  "product": "Circular Supply Chain Solution",
+  "market_insights": {
+    "growth_rate": 1.114,
+    "competitors": ["Contoso", "Fabrikam", "Globex", "Initech"],
+    "trends": ["Circular economy","Eco‑packaging","Blockchain tracking","Reverse logistics"]
+  },
+  "customer_insights": {
+    "average_sentiment": "positive",
+    "top_requests": ["Better usability","Lower cost","Transparent sourcing"]
+  },
+  "compliance": {
+    "regulatory_ready": false,
+    "esg_frameworks": ["GRI","SASB","CSRD"],
+    "co2_intensity_cap": "0.83 kg/pack"
+  },
+  "partners": {
+    "suppliers": ["Supplier 1","Supplier 2","Supplier 3"],
+    "distributors": ["Distributor 1","Distributor 2"]
+  },
+  "design": {
+    "style": "modern",
+    "palette": "navy/lime",
+    "journey": [
+      "User need → 'Better usability'",
+      "User need → 'Lower cost'",
+      "User need → 'Transparent sourcing'",
+      "AI recommends sustainable options",
+      "User compares footprint & cost",
+      "Purchase & onboarding"
+    ]
+  },
+  "go_to_market": {
+    "timeline": [
+      ["Month 1","Finalize partnerships and approvals"],
+      ["Month 2","Pilot with key suppliers/distributors"],
+      ["Month 3","Full campaign rollout"]
+    ],
+    "assets": {
+      "pitch_deck": "Opportunity in LATAM",
+      "brochure": "Sustainability‑first value prop"
+    },
+    "channels": ["Online","Retail","B2B partner marketing"]
+  }
+}
+```
+
+This output shows the orchestrator has gathered market conditions, customer needs, regulatory status, partner options, design concepts, and launch sequencing, all from a single high‑level input. If you change the input—say, the region or product—the orchestrator will re‑evaluate the market, fetch different data via MCP, and produce a new plan tailored to that scenario.
 
 ---
-
-## Roadmap / Next Steps
+# Roadmap / Next Steps
 - Replace mock MCP with real MCP servers (Azure Functions, data APIs).
 - Swap in‑process router with a message bus (Azure Service Bus, Kafka).
 - Add agent **reputation, pricing, and bidding** to proposals.
