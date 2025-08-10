@@ -1,6 +1,4 @@
-# Innovation Orchestrator (A2A + MCP) — PoC
-
-_Last updated: Aug 10, 2025_
+# Innovation Orchestrator (A2A + MCP) - Hackathon '25 - PoC
 
 ## Introduction
 Innovation Orchestrator is a marketplace‑native, multi‑agent proof‑of‑concept that turns high‑level business objectives into launch‑ready strategies in **days, not months**. It demonstrates how a central orchestrator (inspired by Microsoft Semantic Kernel patterns) coordinates specialized agents via the **Agent‑to‑Agent (A2A)** protocol, while each agent uses a **Model Context Protocol (MCP)** client to pull external context (market data, customer signals, partners, compliance/ESG, design assets).
@@ -128,45 +126,130 @@ python -m innovation_orchestrator_a2a.main
 - **MCP Client (mock)**: `mcp_client.py` provides deterministic fake data; swap this with real MCP servers (e.g., Azure Functions, data APIs).
 
 ---
+# How to Run Innovation Orchestrator (File Input & Interactive Input)
 
-## Sample Output (single run)
+Below is a complete example showing two ways to run the **Innovation Orchestrator**:
+- Using a **JSON input file**
+- Using **manual (interactive) input**
+
+The sample outputs illustrate each stage: **ingestion**, agents using the mock **MCP** to fetch data, **agentic (A2A) chatter** logs, and the **final aggregated plan**.
+
+---
+
+## 1) Using a file as input
+
+Create a JSON file (e.g., `input.json`) with the region and product:
+
+```json
+{
+  "region": "APAC",
+  "product": "Sustainable Packaging Solution"
+}
 ```
+
+Run the orchestrator with the file:
+
+```bash
+python3 -m innovation_orchestrator_a2a.main --file input.json
+```
+
+**Sample output:**
+
+```text
+[Orchestrator] Starting plan for product 'Sustainable Packaging Solution' in region 'APAC'
+[Market Insight] Received unhandled ACCEPT message from orchestrator
+[Market Insight] Market trends for APAC: {...}  ← uses MCP to fetch market data
+[Customer Insight] Received unhandled ACCEPT message from orchestrator
+[Customer Insight] Customer signals for Sustainable Packaging Solution: {...}  ← uses MCP to fetch sentiment data
+[Compliance] Received unhandled ACCEPT message from orchestrator
+[Compliance] Regulations for APAC: {...}  ← uses MCP to fetch regulations/ESG data
+[Partnership] Received unhandled ACCEPT message from orchestrator
+[Partnership] Partners for APAC: {...}  ← uses MCP to find suppliers/distributors
+[Design] Received unhandled ACCEPT message from orchestrator
+[Design] Created design with style modern and palette navy/lime  ← uses MCP to pull design assets
+[Go‑to‑Market] Received unhandled ACCEPT message from orchestrator
+[Go‑to‑Market] Compiled go‑to‑market plan for APAC
+[Orchestrator] Plan execution completed
+
+=== Aggregated Plan ===
+region: APAC
+product: Sustainable Packaging Solution
+market_insights: {...}
+customer_insights: {...}
+compliance: {...}
+partners: {...}
+design: {...}
+go_to_market: {...}
+
+=== Agent Logs ===
+-- Orchestrator --
+  Starting plan for product 'Sustainable Packaging Solution' in region 'APAC'
+  Plan execution completed
+-- Market Insight --
+  Received unhandled ACCEPT message from orchestrator
+  Market trends for APAC: {...}
+-- Customer Insight --
+  Received unhandled ACCEPT message from orchestrator
+  Customer signals for Sustainable Packaging Solution: {...}
+-- Partnership --
+  Received unhandled ACCEPT message from orchestrator
+  Partners for APAC: {...}
+-- Compliance --
+  Received unhandled ACCEPT message from orchestrator
+  Regulations for APAC: {...}
+-- Design --
+  Received unhandled ACCEPT message from orchestrator
+  Created design with style modern and palette navy/lime
+-- Go‑to‑Market --
+  Received unhandled ACCEPT message from orchestrator
+  Compiled go‑to‑market plan for APAC
+```
+
+**Step through the flow:**
+
+- **Ingestion:** The `--file` flag tells the orchestrator to load the `region` and `product` from `input.json`.
+- **MCP access:** Each agent invokes the mock MCP client to fetch its domain data (market trends, customer signals, regulations, partners, design assets) before returning results.
+- **Agentic chatter:** The log lines beginning “Received unhandled ACCEPT message…” and the subsequent “Market trends for …” represent the A2A lifecycle (**RFP → PROPOSE → ACCEPT → TASK → RESULT**).
+- **Result:** The orchestrator aggregates all agent results into a unified plan and prints both the plan and each agent’s log.
+
+---
+
+## 2) Using manual (interactive) input
+
+Run the orchestrator without flags:
+
+```bash
+python3 -m innovation_orchestrator_a2a.main
+```
+
+When prompted, enter values like:
+
+```text
+Enter the target region:  LATAM
+Enter the high‑level product/solution description:  Circular Supply Chain Solution
+```
+
+**Sample output (abridged):**
+
+```text
 [Orchestrator] Starting plan for product 'Circular Supply Chain Solution' in region 'LATAM'
-[Market Insight] Market trends for LATAM: {'region': 'LATAM', 'growth_rate': 1.114, 'competitors': ['Contoso', 'Fabrikam', 'Globex', 'Initech'], 'trends': ['Circular economy', 'Eco-packaging', 'Blockchain tracking', 'Reverse logistics']}
-[Customer Insight] Customer signals for Circular Supply Chain Solution: {'product': 'Circular Supply Chain Solution', 'average_sentiment': 'positive', 'top_requests': ['Better usability', 'Lower cost', 'Transparent sourcing']}
-[Compliance] Regulations for LATAM: {'region': 'LATAM', 'regulatory_ready': False, 'esg_frameworks': ['GRI', 'SASB', 'CSRD'], 'co2_intensity_cap': '0.83 kg/pack'}
-[Partnership] Partners for LATAM: {'region': 'LATAM', 'suppliers': ['Supplier 1', 'Supplier 2', 'Supplier 3'], 'distributors': ['Distributor 1', 'Distributor 2']}
-[Design] Created design with style modern and palette navy/lime
+[Market Insight] Market trends for LATAM: {...}
+[Customer Insight] Customer signals for Circular Supply Chain Solution: {...}
+[Compliance] Regulations for LATAM: {...}
+...
 [Go‑to‑Market] Compiled go‑to‑market plan for LATAM
 [Orchestrator] Plan execution completed
 
 === Aggregated Plan ===
 region: LATAM
 product: Circular Supply Chain Solution
-market_insights: {'region': 'LATAM', 'growth_rate': 1.114, 'competitors': ['Contoso', 'Fabrikam', 'Globex', 'Initech'], 'trends': ['Circular economy', 'Eco-packaging', 'Blockchain tracking', 'Reverse logistics']}
-customer_insights: {'product': 'Circular Supply Chain Solution', 'average_sentiment': 'positive', 'top_requests': ['Better usability', 'Lower cost', 'Transparent sourcing']}
-compliance: {'region': 'LATAM', 'regulatory_ready': False, 'esg_frameworks': ['GRI', 'SASB', 'CSRD'], 'co2_intensity_cap': '0.83 kg/pack'}
-partners: {'region': 'LATAM', 'suppliers': ['Supplier 1', 'Supplier 2', 'Supplier 3'], 'distributors': ['Distributor 1', 'Distributor 2']}
-design: {'style': 'modern', 'palette': 'navy/lime', 'journey': ["User need → 'Better usability'", "User need → 'Lower cost'", "User need → 'Transparent sourcing'", 'AI recommends sustainable options', 'User compares footprint & cost', 'Purchase & onboarding']}
-go_to_market: {'timeline': [('Month 1', 'Finalize partnerships and approvals'), ('Month 2', 'Pilot with key suppliers/distributors'), ('Month 3', 'Full campaign rollout')], 'assets': {'pitch_deck': 'Opportunity in LATAM', 'brochure': 'Sustainability‑first value prop'}, 'channels': ['Online', 'Retail', 'B2B partner marketing'], 'key_partners': {'region': 'LATAM', 'suppliers': ['Supplier 1', 'Supplier 2', 'Supplier 3'], 'distributors': ['Distributor 1', 'Distributor 2']}}
-
-=== Agent Logs (excerpt) ===
--- Orchestrator --
-  Starting plan for product 'Circular Supply Chain Solution' in region 'LATAM'
-  Plan execution completed
--- Market Insight --
-  Market trends for LATAM: {...}
--- Customer Insight --
-  Customer signals for Circular Supply Chain Solution: {...}
--- Partnership --
-  Partners for LATAM: {...}
--- Compliance --
-  Regulations for LATAM: {...}
--- Design --
-  Created design with style modern and palette navy/lime
--- Go‑to‑Market --
-  Compiled go‑to‑market plan for LATAM
+market_insights: {...}
+customer_insights: {...}
+...
 ```
+
+The process is identical to the file‑based run: the orchestrator collects `region` and `product` from the user, kicks off the same A2A negotiation/communication sequence, uses MCP for data, and finishes with a consolidated plan.
+
 
 ---
 
